@@ -12,7 +12,7 @@ app.use(cors());
 app.use(express.json());
 
 // MongoDB
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.65uiw.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.${process.env.DB_C}.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
@@ -30,6 +30,16 @@ async function mongodbCURD() {
     database name and collection init
     ------------------------------------- */
     const database = client.db('doctorPortal');
+    const appointmentCollection = database.collection('appointments');
+    /* ------------------------------------- 
+    Appointments APIs
+    ------------------------------------- */
+    app.post('/appointments', async (req, res) => {
+      const appointment = req.body;
+      const result = await appointmentCollection.insertOne(appointment);
+      console.log(result);
+      res.json(result);
+    });
   } finally {
     // await client.close();
   }
