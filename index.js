@@ -50,6 +50,16 @@ async function mongodbCURD() {
       // console.log(result);
       res.json(result);
     });
+    app.get('/users/:email', async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const result = await userCollection.findOne(query);
+      let isAdmin = false;
+      if (result?.role === 'admin') {
+        isAdmin = true;
+      }
+      res.json({ admin: isAdmin });
+    });
     app.post('/users', async (req, res) => {
       const user = req.body;
       const result = await userCollection.insertOne(user);
@@ -63,6 +73,14 @@ async function mongodbCURD() {
       const options = { upsert: true };
       const updateDoc = { $set: user };
       const result = await userCollection.updateOne(query, updateDoc, options);
+      res.json(result);
+    });
+
+    app.put('/users/admin', async (req, res) => {
+      const user = req.body;
+      const filter = { email: user.email };
+      const updateDoc = { $set: { role: 'admin' } };
+      const result = await userCollection.updateOne(filter, updateDoc);
       res.json(result);
     });
   } finally {
